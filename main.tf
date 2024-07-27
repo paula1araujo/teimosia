@@ -79,6 +79,13 @@ resource "azurerm_virtual_machine" "vm" {
   provisioner "file" {
     source      = "install_docker.sh"
     destination = "/tmp/install_docker.sh"
+
+    connection {
+      type        = "ssh"
+      user        = "adminuser"
+      private_key = file(var.ssh_key)
+      host        = azurerm_public_ip.public_ip.ip_address
+    }
   }
 
   provisioner "remote-exec" {
@@ -130,3 +137,4 @@ resource "azurerm_network_interface_security_group_association" "nsg_assoc" {
   network_interface_id      = azurerm_network_interface.nic.id
   network_security_group_id = azurerm_network_security_group.nsg.id
 }
+
