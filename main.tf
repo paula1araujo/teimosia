@@ -30,6 +30,7 @@ resource "azurerm_network_interface" "nic" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.public_ip.id
   }
 }
 
@@ -38,19 +39,6 @@ resource "azurerm_public_ip" "public_ip" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Static"
-}
-
-resource "azurerm_network_interface" "nic" {
-  name                = "example-nic"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-
-  ip_configuration {
-    name                          = "internal"
-    subnet_id                     = azurerm_subnet.subnet.id
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.public_ip.id
-  }
 }
 
 resource "azurerm_virtual_machine" "vm" {
@@ -86,6 +74,25 @@ resource "azurerm_virtual_machine" "vm" {
 
   tags = {
     environment = "Terraform Demo"
+  }
+
+  provisioner "file" {
+    source      = "install_docker.sh"
+    destination = "/tmp/install_docker.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/install_docker.sh",
+      "sudo /tmp/install_docker.sh"
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "adminuser"
+      private_key = file(var.ssh_key)
+      host        = azurerm_public_ip.public_ip.ip_address
+    }
   }
 }
 
