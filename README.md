@@ -14,5 +14,5 @@ This repository contains Terraform configuration files to create an Azure VM, in
 1. Clone this repository:
 
 ```bash
-git clone https://github.com/yourusername/terraform-azure-wordpress.git
+git clone https://github.com/paula1araujo/terraform-azure-wordpress.git
 cd terraform-azure-wordpress
